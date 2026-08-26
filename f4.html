@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persistent Custom Dropdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], select, button {
+            padding: 10px;
+            margin: 6px 0;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"] {
+            width: 70%;
+        }
+
+        .btn-add {
+            width: 28%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-reset {
+            width: 100%;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Custom Dropdown List</h2>
+
+        <!-- Input Section to Add Custom Options -->
+        <div>
+            <input type="text" id="customInput" placeholder="Enter a new option">
+            <button class="btn-add" onclick="addOption()">Add</button>
+        </div>
+
+        <!-- Dropdown Menu Section -->
+        <div style="margin-top: 15px;">
+            <label for="userChoices">Select an option:</label>
+            <select id="userChoices">
+                <option value="" disabled selected>-- Select an option --</option>
+            </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <button class="btn-submit" onclick="saveChoice()">Submit Choice</button>
+        <button class="btn-reset" onclick="clearSavedOptions()">Reset Saved Options</button>
+
+        <!-- Display Output -->
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Load options from localStorage when the page loads
+        window.onload = function() {
+            loadSavedOptions();
+        };
+
+        // Function to add new user option
+        function addOption() {
+            const input = document.getElementById("customInput");
+            const text = input.value.trim();
+
+            if (text !== "") {
+                // Fetch existing options array or create a new one
+                let savedOptions = JSON.parse(localStorage.getItem("myDropdownOptions")) || [];
+                
+                // Add the new text to the array and save back to localStorage
+                savedOptions.push(text);
+                localStorage.setItem("myDropdownOptions", JSON.stringify(savedOptions));
+
+                // Append option to HTML dropdown menu
+                appendOptionToDropdown(text);
+
+                // Select the newly added item automatically
+                document.getElementById("userChoices").value = text;
+                input.value = "";
+                document.getElementById("result").innerText = `Saved "${text}" successfully!`;
+            } else {
+                alert("Please enter a valid text option first.");
+            }
+        }
+
+        // Helper function to append option element into <select>
+        function appendOptionToDropdown(text) {
+            const dropdown = document.getElementById("userChoices");
+            const newOption = document.createElement("option");
+            newOption.value = text;
+            newOption.text = text;
+            dropdown.add(newOption);
+        }
+
+        // Function to retrieve options from localStorage on page refresh
+        function loadSavedOptions() {
+            let savedOptions = JSON.parse(localStorage.getItem("myDropdownOptions")) || [];
+            savedOptions.forEach(optionText => {
+                appendOptionToDropdown(optionText);
+            });
+        }
+
+        // Function to submit chosen option
+        function saveChoice() {
+            const dropdown = document.getElementById("userChoices");
+            const selectedValue = dropdown.value;
+            const resultDiv = document.getElementById("result");
+
+            if (selectedValue) {
+                resultDiv.innerText = "Current Selection: " + selectedValue;
+            } else {
+                resultDiv.innerText = "Please select or add an option first!";
+            }
+        }
+
+        // Function to clear saved data from memory
+        function clearSavedOptions() {
+            localStorage.removeItem("myDropdownOptions");
+            location.reload();
+        }
+    </script>
+
+</body>
+</html>
